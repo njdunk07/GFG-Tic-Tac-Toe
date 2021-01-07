@@ -3,9 +3,11 @@ package com.example.tictactoe;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     boolean gameActive = true;
@@ -23,15 +25,24 @@ public class MainActivity extends AppCompatActivity {
             {0,3,6}, {1,4,7}, {2,5,8},
             {0,4,8}, {2,4,6}};
     //this function will be called every time a players tap in an empty box of the grid
+    public static int counter = 0;
     public void playerTap(View view){
         ImageView img = (ImageView) view;
         int tappedImage = Integer.parseInt(img.getTag().toString());
         //game reset function will be called if someone wins or the boxes are full
         if(!gameActive){
+            counter = 0;
             gameReset(view);
         }
         //if the tapped image is empty
         if(gameState[tappedImage] == 2) {
+            //increase the counter after every tap
+            counter++;
+            //check if its the last box
+            if(counter==9) {
+                //reset the game
+                gameActive = false;
+            }
             //mark this position
             gameState[tappedImage] = activePlayer;
             //this will give a motion effect to the image
@@ -54,11 +65,14 @@ public class MainActivity extends AppCompatActivity {
             }
             img.animate().translationYBy(1000f).setDuration(300);
         }
+        int flag = 0;
         // Check if any player has won
         for(int[] winPosition: winPositions){
+
             if(gameState[winPosition[0]] == gameState[winPosition[1]] &&
                     gameState[winPosition[1]] == gameState[winPosition[2]] &&
                     gameState[winPosition[0]]!=2){
+                flag = 1;
                 // Somebody has won! - Find out who!
                 String winnerStr;
                 //game reset function be called
@@ -73,6 +87,12 @@ public class MainActivity extends AppCompatActivity {
                 TextView status = findViewById(R.id.status);
                 status.setText(winnerStr);
             }
+            //in case of draw match
+        }
+        //set the status if the match draw
+        if(counter==9 && flag==0) {
+            TextView status = findViewById(R.id.status);
+            status.setText("Match Draw");
         }
 
     }
